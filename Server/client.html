@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body
+      {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0; 
+      }
+      .BlackSquare 
+      {
+        width: 100px; 
+        height: 100px;
+        background-color: rgb(39, 153, 161);
+        margin: 0;
+        float: left;
+        text-align: center;
+        font-size: 90px;
+        padding: 0px;
+      }
+      .WhiteSquare 
+      {
+        width: 100px; 
+        height: 100px;
+        background-color: #d1d1d1;
+        margin: 0;
+        float: left;
+        text-align: center;
+        font-size: 90px;
+        padding: 0px;
+      }
+      .WhosPlayText
+      {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-top: 20px; /* spacing */
+        margin-left: 20px; /* spacing */
+        color: rgb(39, 153, 161);
+        font-family: "Lucida Console", "Courier New", monospace;
+      }   
+      .grid-container 
+      {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        gap: 2px;
+        border: 3px solid #000;
+        background-color: #000;
+      }
+      .grid-AiPawns
+      {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        position: absolute;
+        top: 0;
+        right: 0;
+        gap: 2px;
+        margin-top: 50px; /* spacing */
+        margin-right: 70px; /* spacing */
+        background-color: rgb(39, 153, 161);
+      }
+      .grid-PlayerPawns
+      {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        gap: 2px;
+        margin-bottom: 50px; /* spacing */
+        margin-right: 70px; /* spacing */
+        background-color: rgb(39, 153, 161);
+      }
+      .PawnsGridItem
+      {
+        width: 80px; 
+        height: 40px;
+        background-color: #ffffff;
+        text-align: center;
+        font-size: 40px;
+        margin: 0;
+        padding: 0px;
+      }
+      .Numbers
+      {
+        position: absolute; 
+        left: 500px; 
+        margin-top: 20px; 
+        margin-left: 20px; 
+        font-size: 2pc; 
+        font-weight: 100;
+        color: rgb(25, 106, 112);
+        font-family: "Lucida Console", "Courier New", monospace;
+      }
+      .Alphabet
+      {
+        position: absolute;
+        top: 10px;  
+        margin-top: 0px; 
+        margin-left: 20px; 
+        font-size: 2pc; 
+        font-weight: 100;
+        color: rgb(25, 106, 112);
+        font-family: "Lucida Console", "Courier New", monospace;
+      }
+      .ScrollHistoryMoves
+      {
+        overflow: auto;
+        position: absolute;
+        top: 120px;
+        left: 50px;
+        width: 150px;
+        height: 200px;
+        background-color: rgb(196, 236, 228);
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        font-size: 1.5pc;
+      }
+    </style>
+    <title>Chess Game</title>
+</head>
+<body onload="onLoadFunction()">
+
+  <h2 style="position: absolute; top: 80px; left: 45px; font-size: 1pc; font-family: 'Lucida Sans';">History Moves For AI</h2>
+  <h2 style="position: absolute; top: 560px; left: 35px; font-size: 1pc; font-family: 'Lucida Sans';">History Moves For Player</h2>
+  <button onclick="ChangeToBlack()" style="position: absolute; top: 300px; left: 1700px;" >You Are With Black</button>
+  <button onclick="ChangeToWhite()" style="position: absolute; top: 350px; left: 1700px;" >You Are With White</button>
+  <button onclick="changeColor('green')" style="position: absolute; top: 10px; left: 1850px; height: 20px; width: 20px; background-color: rgb(117, 202, 114);"></button>
+  <button onclick="changeColor('red')" style="position: absolute; top: 10px; left: 1815px; height: 20px; width: 20px; background-color: rgb(236, 130, 10);"></button>
+  <button onclick="changeColor('blue')" style="position: absolute; top: 10px; left: 1780px; height: 20px; width: 20px; background-color: rgb(67, 188, 197);"></button>
+  <h2 id="WhosPlay" class="WhosPlayText">Choose What Color You Want...</h2>
+
+  <div class="ScrollHistoryMoves" id = "400"></div>
+  <div class="ScrollHistoryMoves" style="top:600px;" id = "300"></div>
+
+<!-- Grid for Ai Pawns which Player has put out of the game -->
+  <div class = "grid-AiPawns">
+    <div class = "PawnsGridItem" id = "100"></div>
+    <div class = "PawnsGridItem" id = "101"></div>
+    <div class = "PawnsGridItem" id = "102"></div>
+    <div class = "PawnsGridItem" id = "103"></div>
+    <div class = "PawnsGridItem" id = "104"></div>
+    <div class = "PawnsGridItem" id = "105"></div>
+    <div class = "PawnsGridItem" id = "106"></div>
+    <div class = "PawnsGridItem" id = "107"></div>
+    <div class = "PawnsGridItem" id = "108"></div>
+    <div class = "PawnsGridItem" id = "109"></div>
+    <div class = "PawnsGridItem" id = "110"></div>
+    <div class = "PawnsGridItem" id = "111"></div>
+    <div class = "PawnsGridItem" id = "112"></div>
+    <div class = "PawnsGridItem" id = "113"></div>
+    <div class = "PawnsGridItem" id = "114"></div>
+    <div class = "PawnsGridItem" id = "115"></div>
+  </div>
+
+<!-- Grid for Player Pawns which Ai has put out of the game -->
+  <div class = "grid-PlayerPawns">
+    <div class = "PawnsGridItem" id = "200"></div>
+    <div class = "PawnsGridItem" id = "201"></div>
+    <div class = "PawnsGridItem" id = "202"></div>
+    <div class = "PawnsGridItem" id = "203"></div>
+    <div class = "PawnsGridItem" id = "204"></div>
+    <div class = "PawnsGridItem" id = "205"></div>
+    <div class = "PawnsGridItem" id = "206"></div>
+    <div class = "PawnsGridItem" id = "207"></div>
+    <div class = "PawnsGridItem" id = "208"></div>
+    <div class = "PawnsGridItem" id = "209"></div>
+    <div class = "PawnsGridItem" id = "210"></div>
+    <div class = "PawnsGridItem" id = "211"></div>
+    <div class = "PawnsGridItem" id = "212"></div>
+    <div class = "PawnsGridItem" id = "213"></div>
+    <div class = "PawnsGridItem" id = "214"></div>
+    <div class = "PawnsGridItem" id = "215"></div>
+  </div>
+
+  <!-- Global Variable -->
+  <script>
+    var AIcolor = "";
+    var PlayerColor = "";
+    var buttonClick = 0;
+    var countClicks = 0;
+    var colorChange = "";
+    var squareText;
+    var firstClickId;
+  </script>
+
+  <script>
+    function onLoadFunction()
+    {
+      posFile();
+    }
+  </script>
+
+  <script>
+    function reloadPage()
+    {
+      location.reload();
+    }
+  </script>
+  
+<!-- Change the color from board and grids -->
+  <script>
+    function changeColor(name)
+    {
+      var element;
+      var color1, color2;
+
+      if(name == 'blue')
+      {
+        color1 = 'rgb(39, 153, 161)';
+        color2 = 'rgb(196, 236, 228)';
+        colorChange = "blue";
+      }
+      else if(name == 'red')
+      {
+        color1 = 'rgb(199, 137, 22)';
+        color2 = 'rgb(236, 219, 196)';
+        colorChange = "red";
+      }
+      else if(name == 'green')
+      {
+        color1 = 'rgb(67, 139, 91)';
+        color2 = 'rgb(183, 224, 181)';
+        colorChange = "green";
+      }
+
+      for(var i = 0; i < document.querySelectorAll('.BlackSquare').length; i++)
+      {
+        element = document.querySelectorAll('.BlackSquare')[i];
+        element.style.backgroundColor = color1;
+      }
+
+      for(var i = 0; i < document.querySelectorAll('.Numbers').length; i++)
+      {
+        element = document.querySelectorAll('.Numbers')[i];
+        element.style.color = color1;
+      }
+
+      for(var i = 0; i < document.querySelectorAll('.Alphabet').length; i++)
+      {
+        element = document.querySelectorAll('.Alphabet')[i];
+        element.style.color = color1;
+      }
+
+      document.getElementById("WhosPlay").style.color = color1;
+      document.getElementById("300").style.backgroundColor = color2;
+      document.getElementById("400").style.backgroundColor = color2;
+
+      document.querySelectorAll('.grid-AiPawns')[0].style.backgroundColor = color1;
+      document.querySelectorAll('.grid-AiPawns')[0].style.border = color1;
+
+      document.querySelectorAll('.grid-PlayerPawns')[0].style.backgroundColor = color1;
+      document.querySelectorAll('.grid-PlayerPawns')[0].style.border = color1;
+    }
+  </script>
+
+<!-- Player will have black panws -->
+  <script>
+    function ChangeToBlack()
+    {
+      AIcolor = "w";
+      PlayerColor = "b";
+
+      // initialize the pawns' positions
+      var newContent = "";
+
+      newContent = '<div class="Alphabet" style="left: 575px;">a</div>\
+                    <div class="Alphabet" style="left: 675px;">b</div>\
+                    <div class="Alphabet" style="left: 780px;">c</div>\
+                    <div class="Alphabet" style="left: 875px;">d</div>\
+                    <div class="Alphabet" style="left: 975px;">e</div>\
+                    <div class="Alphabet" style="left: 1085px;">f</div>\
+                    <div class="Alphabet" style="left: 1185px;">g</div>\
+                    <div class="Alphabet" style="left: 1285px;">h</div>\
+                    <div class="Numbers" style="bottom: 790px;" >8</div>\
+                    <div class = "Numbers" style="bottom: 690px;" >7</div>\
+                    <div class = "Numbers" style="bottom: 590px;" >6</div>\
+                    <div class = "Numbers" style="bottom: 480px;" >5</div>\
+                    <div class = "Numbers" style="bottom: 380px;" >4</div>\
+                    <div class = "Numbers" style="bottom: 280px;" >3</div>\
+                    <div class = "Numbers" style="bottom: 180px;" >2</div>\
+                    <div class = "Numbers" style="bottom: 80px;" >1</div>\
+                    <div class="BlackSquare" id = "00" data-color="white" onclick="handleClick(this)">♖</div>\
+                    <div class="WhiteSquare" id = "01" data-color="white" onclick="handleClick(this)">♘</div>\
+                    <div class="BlackSquare" id = "02" data-color="white" onclick="handleClick(this)">♗</div>\
+                    <div class="WhiteSquare" id = "03" data-color="white" onclick="handleClick(this)">♕</div>\
+                    <div class="BlackSquare" id = "04" data-color="white" onclick="handleClick(this)">♔</div>\
+                    <div class="WhiteSquare" id = "05" data-color="white" onclick="handleClick(this)">♗</div>\
+                    <div class="BlackSquare" id = "06" data-color="white" onclick="handleClick(this)">♘</div>\
+                    <div class="WhiteSquare" id = "07" data-color="white" onclick="handleClick(this)">♖</div>\
+                    <div class="WhiteSquare" id = "10" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "11" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "12" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "13" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "14" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "15" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "16" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "17" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "20" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "21" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "22" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "23" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "24" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "25" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "26" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "27" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "30" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "31" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "32" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "33" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "34" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "35" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "36" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "37" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "40" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "41" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "42" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "43" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "44" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "45" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "46" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "47" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "50" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "51" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "52" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "53" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "54" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "55" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "56" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "57" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "60" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "61" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "62" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "63" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "64" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "65" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "66" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "67" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "70" data-color="black" onclick="handleClick(this)">♜</div>\
+                    <div class="BlackSquare" id = "71" data-color="black" onclick="handleClick(this)">♞</div>\
+                    <div class="WhiteSquare" id = "72" data-color="black" onclick="handleClick(this)">♝</div>\
+                    <div class="BlackSquare" id = "73" data-color="black" onclick="handleClick(this)">♛</div>\
+                    <div class="WhiteSquare" id = "74" data-color="black" onclick="handleClick(this)">♚</div>\
+                    <div class="BlackSquare" id = "75" data-color="black" onclick="handleClick(this)">♝</div>\
+                    <div class="WhiteSquare" id = "76" data-color="black" onclick="handleClick(this)">♞</div>\
+                    <div class="BlackSquare" id = "77" data-color="black" onclick="handleClick(this)">♜</div>';
+
+      document.getElementById("1000").innerHTML = newContent;
+      buttonClick = 1;
+
+      // initialize history for Player and Ai
+      document.getElementById("300").innerText = "";
+      document.getElementById("400").innerText = "";
+
+      document.getElementById("100").innerText = "";
+      document.getElementById("101").innerText = "";
+      document.getElementById("102").innerText = "";
+      document.getElementById("103").innerText = "";
+      document.getElementById("104").innerText = "";
+      document.getElementById("105").innerText = "";
+      document.getElementById("106").innerText = "";
+      document.getElementById("107").innerText = "";
+      document.getElementById("108").innerText = "";
+      document.getElementById("109").innerText = "";
+      document.getElementById("110").innerText = "";
+      document.getElementById("111").innerText = "";
+      document.getElementById("112").innerText = "";
+      document.getElementById("113").innerText = "";
+      document.getElementById("114").innerText = "";
+      document.getElementById("115").innerText = "";
+
+      document.getElementById("200").innerText = "";
+      document.getElementById("201").innerText = "";
+      document.getElementById("202").innerText = "";
+      document.getElementById("203").innerText = "";
+      document.getElementById("204").innerText = "";
+      document.getElementById("205").innerText = "";
+      document.getElementById("206").innerText = "";
+      document.getElementById("207").innerText = "";
+      document.getElementById("208").innerText = "";
+      document.getElementById("209").innerText = "";
+      document.getElementById("210").innerText = "";
+      document.getElementById("211").innerText = "";
+      document.getElementById("212").innerText = "";
+      document.getElementById("213").innerText = "";
+      document.getElementById("214").innerText = "";
+      document.getElementById("215").innerText = "";
+
+      posFile();
+      opponentPlay();
+
+      // Cange Board color if player want
+      if(colorChange == "green")
+      {
+        changeColor('green');
+      }
+      else if(colorChange == "red")
+      {
+        changeColor('red');
+      }
+      else if(colorChange == "blue")
+      {
+        changeColor('blue');
+      }
+    }
+  </script>
+
+<!-- Player will have White Panws -->
+  <script>
+    function ChangeToWhite()
+    {
+      AIcolor = "b";
+      PlayerColor = "w";
+
+      // initialize the pawns' positions
+      var newContent = "";
+
+      newContent = '<div class="Alphabet" style="left: 575px;">a</div>\
+                    <div class="Alphabet" style="left: 675px;">b</div>\
+                    <div class="Alphabet" style="left: 780px;">c</div>\
+                    <div class="Alphabet" style="left: 875px;">d</div>\
+                    <div class="Alphabet" style="left: 975px;">e</div>\
+                    <div class="Alphabet" style="left: 1085px;">f</div>\
+                    <div class="Alphabet" style="left: 1185px;">g</div>\
+                    <div class="Alphabet" style="left: 1285px;">h</div>\
+                    <div class="Numbers" style="bottom: 790px;" >8</div>\
+                    <div class = "Numbers" style="bottom: 690px;" >7</div>\
+                    <div class = "Numbers" style="bottom: 590px;" >6</div>\
+                    <div class = "Numbers" style="bottom: 480px;" >5</div>\
+                    <div class = "Numbers" style="bottom: 380px;" >4</div>\
+                    <div class = "Numbers" style="bottom: 280px;" >3</div>\
+                    <div class = "Numbers" style="bottom: 180px;" >2</div>\
+                    <div class = "Numbers" style="bottom: 80px;" >1</div>\
+                    <div class="BlackSquare" id = "00" data-color="black" onclick="handleClick(this)">♜</div>\
+                    <div class="WhiteSquare" id = "01" data-color="black" onclick="handleClick(this)">♞</div>\
+                    <div class="BlackSquare" id = "02" data-color="black" onclick="handleClick(this)">♝</div>\
+                    <div class="WhiteSquare" id = "03" data-color="black" onclick="handleClick(this)">♛</div>\
+                    <div class="BlackSquare" id = "04" data-color="black" onclick="handleClick(this)">♚</div>\
+                    <div class="WhiteSquare" id = "05" data-color="black" onclick="handleClick(this)">♝</div>\
+                    <div class="BlackSquare" id = "06" data-color="black" onclick="handleClick(this)">♞</div>\
+                    <div class="WhiteSquare" id = "07" data-color="black" onclick="handleClick(this)">♜</div>\
+                    <div class="WhiteSquare" id = "10" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "11" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "12" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "13" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "14" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "15" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="WhiteSquare" id = "16" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "17" data-color="black" onclick="handleClick(this)">♟</div>\
+                    <div class="BlackSquare" id = "20" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "21" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "22" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "23" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "24" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "25" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "26" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "27" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "30" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "31" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "32" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "33" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "34" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "35" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "36" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "37" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "40" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "41" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "42" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "43" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "44" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "45" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "46" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "47" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "50" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "51" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "52" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "53" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "54" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "55" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="WhiteSquare" id = "56" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "57" data-color="" onclick="handleClick(this)"></div>\
+                    <div class="BlackSquare" id = "60" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "61" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "62" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "63" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "64" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "65" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="BlackSquare" id = "66" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "67" data-color="white" onclick="handleClick(this)">♙</div>\
+                    <div class="WhiteSquare" id = "70" data-color="white" onclick="handleClick(this)">♖</div>\
+                    <div class="BlackSquare" id = "71" data-color="white" onclick="handleClick(this)">♘</div>\
+                    <div class="WhiteSquare" id = "72" data-color="white" onclick="handleClick(this)">♗</div>\
+                    <div class="BlackSquare" id = "73" data-color="white" onclick="handleClick(this)">♕</div>\
+                    <div class="WhiteSquare" id = "74" data-color="white" onclick="handleClick(this)">♔</div>\
+                    <div class="BlackSquare" id = "75" data-color="white" onclick="handleClick(this)">♗</div>\
+                    <div class="WhiteSquare" id = "76" data-color="white" onclick="handleClick(this)">♘</div>\
+                    <div class="BlackSquare" id = "77" data-color="white" onclick="handleClick(this)">♖</div>';
+
+      document.getElementById("1000").innerHTML = newContent;
+      document.getElementById("WhosPlay").innerText = "Your Turn..."
+      buttonClick = 1;
+
+      // initialize history for Player and Ai
+      document.getElementById("300").innerText = "";
+      document.getElementById("400").innerText = "";
+
+      document.getElementById("100").innerText = "";
+      document.getElementById("101").innerText = "";
+      document.getElementById("102").innerText = "";
+      document.getElementById("103").innerText = "";
+      document.getElementById("104").innerText = "";
+      document.getElementById("105").innerText = "";
+      document.getElementById("106").innerText = "";
+      document.getElementById("107").innerText = "";
+      document.getElementById("108").innerText = "";
+      document.getElementById("109").innerText = "";
+      document.getElementById("110").innerText = "";
+      document.getElementById("111").innerText = "";
+      document.getElementById("112").innerText = "";
+      document.getElementById("113").innerText = "";
+      document.getElementById("114").innerText = "";
+      document.getElementById("115").innerText = "";
+
+      document.getElementById("200").innerText = "";
+      document.getElementById("201").innerText = "";
+      document.getElementById("202").innerText = "";
+      document.getElementById("203").innerText = "";
+      document.getElementById("204").innerText = "";
+      document.getElementById("205").innerText = "";
+      document.getElementById("206").innerText = "";
+      document.getElementById("207").innerText = "";
+      document.getElementById("208").innerText = "";
+      document.getElementById("209").innerText = "";
+      document.getElementById("210").innerText = "";
+      document.getElementById("211").innerText = "";
+      document.getElementById("212").innerText = "";
+      document.getElementById("213").innerText = "";
+      document.getElementById("214").innerText = "";
+      document.getElementById("215").innerText = "";
+      
+      posFile();
+
+      // Change color id player want
+      if(colorChange == "green")
+      {
+        changeColor('green');
+      }
+      else if(colorChange == "red")
+      {
+        changeColor('red');
+      }
+      else if(colorChange == "blue")
+      {
+        changeColor('blue');
+      }
+    }
+  </script>
+
+<!-- Make opponent move -->
+  <script>
+    function opponentMove(Move)
+    {
+      var inX, inY, outX, outY;
+      var panwText;
+      var x, z;
+      var opponentColor;
+
+      if(buttonClick == 0) { return; }
+
+      if(AIcolor == "b") { opponentColor = "black"; }
+      else { opponentColor = "white"; }
+
+      inX = Move.charAt(0).toString();
+
+      // Check Checkmate or Draw, this information is in position.txt
+      if(inX == 'C')
+      {
+        alert("Checkmate. You Win. Let's Play Again.");
+        reloadPage();
+      }
+      else if(inX == 'N')
+      {
+        alert("No Moves. Draw. Let's Play Again.");
+        reloadPage();
+      }
+
+      inY = Move.charAt(2).toString();
+      outX = Move.charAt(4).toString();
+      outY = Move.charAt(6).toString();
+      
+      if(document.getElementById(inX + inY).getAttribute('data-color') == opponentColor)
+      {
+        panwText = document.getElementById(inX + inY).innerText;
+        document.getElementById(inX + inY).innerText = "";
+        document.getElementById(inX + inY).setAttribute('data-color', "");
+
+        // If there is a pawn in the destination position
+        if(document.getElementById(outX + outY).innerText != "")
+        {
+          // Add pawn in grid
+          for(z = 0; z < 16; z++)
+          {
+            if(z <= 9) { x = "2" + "0" + z.toString(); }
+            else { x = "2" + z.toString(); }
+              
+            if(document.getElementById(x).innerText == "")
+            {
+              document.getElementById(x).innerText = document.getElementById(outX + outY).innerText;
+              break;
+            }
+          }
+        }
+        
+        // Make move
+        document.getElementById(outX + outY).innerText = panwText;
+        document.getElementById(outX + outY).setAttribute('data-color', opponentColor);
+      }
+
+      // if a soldier has reached the end of the board then it will become a queen
+      if((outX == 7) && ((document.getElementById(outX + outY).innerText == "♙") || (document.getElementById(outX + outY).innerText == "♟")))
+      {
+        if(AIcolor == "b") { document.getElementById(outX + outY).innerText =  "♛"; }
+        else { document.getElementById(outX + outY).innerText = "♕"; }
+      }
+
+      // Update history
+      var history = "";
+
+      if(inX == 0) { history = history + "8"; }
+      else if(inX == 1) { history = history + "7"; }
+      else if(inX == 2) { history = history + "6"; }
+      else if(inX == 3) { history = history + "5"; }
+      else if(inX == 4) { history = history + "4"; }
+      else if(inX == 5) { history = history + "3"; }
+      else if(inX == 6) { history = history + "2"; }
+      else if(inX == 7) { history = history + "1"; }
+
+      if(inY == 0) { history = history + "a "; }
+      else if(inY == 1) { history = history + "b "; }
+      else if(inY == 2) { history = history + "c "; }
+      else if(inY == 3) { history = history + "d "; }
+      else if(inY == 4) { history = history + "e "; }
+      else if(inY == 5) { history = history + "f "; }
+      else if(inY == 6) { history = history + "g "; }
+      else if(inY == 7) { history = history + "h "; }
+
+      history = history + "➜ ";
+
+      if(outX == 0) { history = history + "8"; }
+      else if(outX == 1) { history = history + "7"; }
+      else if(outX == 2) { history = history + "6"; }
+      else if(outX == 3) { history = history + "5"; }
+      else if(outX == 4) { history = history + "4"; }
+      else if(outX == 5) { history = history + "3"; }
+      else if(outX == 6) { history = history + "2"; }
+      else if(outX == 7) { history = history + "1"; }
+
+      if(outY == 0) { history = history + "a"; }
+      else if(outY == 1) { history = history + "b"; }
+      else if(outY == 2) { history = history + "c"; }
+      else if(outY == 3) { history = history + "d"; }
+      else if(outY == 4) { history = history + "e"; }
+      else if(outY == 5) { history = history + "f"; }
+      else if(outY == 6) { history = history + "g"; }
+      else if(outY == 7) { history = history + "h"; }
+
+      document.getElementById("400").innerText = history + "\n" + document.getElementById("400").innerText;
+
+      document.getElementById("WhosPlay").innerHTML = "Your Turn...";
+    }
+  </script>
+
+<!-- Print pawn's possible moves when player click it -->
+  <script>
+    function printMoves(Moves)
+    {
+      // check for checkmate or draw
+      if(Moves.charAt(0).toString() == 'C')
+      {
+        alert("Checkmate. You Lost. Let's Play Again.");
+        reloadPage();
+      }
+      else if (Moves.charAt(0).toString() == 'N')
+      {
+        alert("No Moves. Draw. Let's Play Again.");
+        reloadPage();
+      }
+
+      // Get every move one by one
+      var lines = Moves.split('\n'), xPos, yPos, coordinates;
+
+      for (var i = 0; i < lines.length; i++) 
+      {
+        coordinates = lines[i].split(' ');
+        xPos = coordinates[0];
+        yPos = coordinates[1];
+
+        // if there is not an oppponent pawn
+        if(document.getElementById(xPos + yPos).innerText == "")
+        {
+          document.getElementById(xPos + yPos).innerText = "•";
+        }
+        else
+        {
+          document.getElementById(xPos + yPos).style.color = "rgb(255, 0, 0)";
+        }
+      }
+    }
+  </script>
+
+<!-- Tell server to run the Chess executable  -->
+  <script>
+    function opponentPlay()
+    {
+      document.getElementById("WhosPlay").innerHTML = "Wait AI To Play...";
+
+      var xhr = new XMLHttpRequest();
+      
+      xhr.open('GET', 'http://127.0.0.1:8000/opponentPlay', true);
+
+      xhr.onload = function() 
+      {
+        if (xhr.status >= 200 && xhr.status < 300) 
+        {
+          opponentMove(xhr.responseText);
+        }
+        else 
+        {
+          alert('Error: ' + xhr.statusText);
+        }
+      };
+
+      xhr.onerror = function() 
+      {
+        alert('Request failed');
+      };
+
+      xhr.send();
+    }
+  </script>
+
+<!-- Tell server to run the GetMoves executable -->
+  <script>
+    function getMoves()
+    {
+      var xhr = new XMLHttpRequest();
+      
+      xhr.open('GET', 'http://127.0.0.1:8000/getMoves', true);
+
+      xhr.onload = function() 
+      {
+        if (xhr.status >= 200 && xhr.status < 300) 
+        {
+          printMoves(xhr.responseText);
+        }
+        else 
+        {
+          alert('Error: ' + xhr.statusText);
+        }
+      };
+
+      xhr.onerror = function() 
+      {
+        alert('Request failed');
+      };
+
+      xhr.send();
+    }
+  </script>
+
+<!-- Give the position data to server and the server stores this data in position.txt -->
+  <script>
+    function postMessage(data)
+    {
+      var xhr = new XMLHttpRequest();
+
+      xhr.open('POST', 'http://127.0.0.1:8000/pos', true);
+
+      xhr.setRequestHeader('Content-type', 'text/plain');
+
+      xhr.onreadystatechange = function() 
+      {
+        if(xhr.readyState == 4 && xhr.status == 200) 
+        {
+          alert(xhr.responseText);
+        }
+      };
+      
+      xhr.send(data);
+    }
+  </script>
+
+<!-- Give the pawn's position to server and the server stores this data in selectPawns.txt  -->
+  <script>
+    function creatSelectPawn(data)
+    {
+      var xhr = new XMLHttpRequest();
+
+      xhr.open('POST', 'http://127.0.0.1:8000/selectPawn', true);
+
+      xhr.setRequestHeader('Content-type', 'text/plain');
+
+      xhr.onreadystatechange = function() 
+      {
+        if(xhr.readyState == 4 && xhr.status == 200) 
+        {
+          alert(xhr.responseText);
+        }
+      };
+      
+      xhr.send(data);
+    }
+  </script>
+
+<!-- Clean all marks for potential pawn moves -->
+  <script>
+    function clearMarks()
+    {
+      var i, j, xPos, yPos, pos;
+
+      for(i = 0; i < 8; i++)
+      {
+        xPos = i.toString();
+
+        for(j = 0; j < 8; j++)
+        {
+          yPos = j.toString();
+          pos = xPos + yPos;
+
+          if(document.getElementById(pos).innerText == "•")
+          {
+            document.getElementById(pos).innerText = "";
+          }
+          else if((document.getElementById(pos).innerText != "") && (document.getElementById(pos).style.color == "rgb(255, 0, 0)"))
+          {
+            document.getElementById(pos).style.color = "rgb(0, 0, 0)";
+          }
+        }
+      }
+    }
+  </script>
+
+<!-- Handle plyer clicks -->
+  <script>
+    function handleClick(obj) 
+    {
+      var dataSelectPawn = "";
+      var i, j, pos, xPos, yPos;
+      var YourColor;
+
+      if(PlayerColor == "b") { YourColor = "black"; }
+      else { YourColor = "white"; }
+
+      // First click. We store the position of the pawn the player clicked on
+      if(countClicks == 0)
+      {
+        if(obj.getAttribute('data-color') == YourColor)
+        {
+          squareText = obj.innerText;
+          firstClickId = obj.id;
+          countClicks = countClicks + 1;
+          dataSelectPawn = dataSelectPawn + obj.id.charAt(0).toString() + " " + obj.id.charAt(1).toString();
+          // Ask server to give us possible pawn's moves
+          posFile();
+          creatSelectPawn(dataSelectPawn);
+          getMoves();
+          return;
+        }
+      }
+      else if(countClicks == 1) // second click. We do the move
+      {
+        countClicks = 0;
+
+        if(obj.innerText == "•" || obj.style.color == "rgb(255, 0, 0)")
+        {
+          var x, z;
+
+          if(obj.style.color == "rgb(255, 0, 0)")
+          {
+            for(z = 0; z < 16; z++)
+            {
+              if(z <= 9) { x = "1" + "0" + z.toString(); } 
+              else { x = "1" + z.toString(); }
+              
+              if(document.getElementById(x).innerText == "")
+              {
+                document.getElementById(x).innerText = obj.innerText;
+                break;
+              }
+            }
+          }
+
+          // Update the history
+          var history = "";
+
+          if(firstClickId.charAt(0) == 0) { history = history + "8"; }
+          else if(firstClickId.charAt(0) == 1) { history = history + "7"; }
+          else if(firstClickId.charAt(0) == 2) { history = history + "6"; }
+          else if(firstClickId.charAt(0) == 3) { history = history + "5"; }
+          else if(firstClickId.charAt(0) == 4) { history = history + "4"; }
+          else if(firstClickId.charAt(0) == 5) { history = history + "3"; }
+          else if(firstClickId.charAt(0) == 6) { history = history + "2"; }
+          else if(firstClickId.charAt(0) == 7) { history = history + "1"; }
+
+          if(firstClickId.charAt(1) == 0) { history = history + "a "; }
+          else if(firstClickId.charAt(1) == 1) { history = history + "b "; }
+          else if(firstClickId.charAt(1) == 2) { history = history + "c "; }
+          else if(firstClickId.charAt(1) == 3) { history = history + "d "; }
+          else if(firstClickId.charAt(1) == 4) { history = history + "e "; }
+          else if(firstClickId.charAt(1) == 5) { history = history + "f "; }
+          else if(firstClickId.charAt(1) == 6) { history = history + "g "; }
+          else if(firstClickId.charAt(1) == 7) { history = history + "h "; }
+
+          history = history + "➜ ";
+
+          if(obj.id.charAt(0) == 0) { history = history + "8"; }
+          else if(obj.id.charAt(0) == 1) { history = history + "7"; }
+          else if(obj.id.charAt(0) == 2) { history = history + "6"; }
+          else if(obj.id.charAt(0) == 3) { history = history + "5"; }
+          else if(obj.id.charAt(0) == 4) { history = history + "4"; }
+          else if(obj.id.charAt(0) == 5) { history = history + "3"; }
+          else if(obj.id.charAt(0) == 6) { history = history + "2"; }
+          else if(obj.id.charAt(0) == 7) { history = history + "1"; }
+
+          if(obj.id.charAt(1) == 0) { history = history + "a"; }
+          else if(obj.id.charAt(1) == 1) { history = history + "b"; }
+          else if(obj.id.charAt(1) == 2) { history = history + "c"; }
+          else if(obj.id.charAt(1) == 3) { history = history + "d"; }
+          else if(obj.id.charAt(1) == 4) { history = history + "e"; }
+          else if(obj.id.charAt(1) == 5) { history = history + "f"; }
+          else if(obj.id.charAt(1) == 6) { history = history + "g"; }
+          else if(obj.id.charAt(1) == 7) { history = history + "h"; }
+
+          document.getElementById("300").innerText = history + "\n" + document.getElementById("300").innerText;
+
+          obj.setAttribute('data-color', document.getElementById(firstClickId).getAttribute('data-color'));
+          document.getElementById(firstClickId).setAttribute('data-color', "");
+          document.getElementById(firstClickId).innerText = "";
+          obj.innerText = squareText;  
+
+          if((obj.id.charAt(0) == 0) && ((obj.innerText == "♙") || (obj.innerText == "♟")))
+          {
+            if(PlayerColor == "b") { obj.innerText =  "♛"; }
+            else { obj.innerText = "♕"; }
+          }
+
+          clearMarks();
+
+          // The opponent has a turn to play
+          posFile();
+          opponentPlay();
+        }
+        
+        clearMarks();
+      }
+
+      return;
+    }
+  </script>
+
+<!-- Store all information about pawns' possition and then call server to save this information in position.txt -->
+  <script>
+    function posFile()
+    {
+      var xPos, yPos, pos;
+      var fileText = "";
+
+      fileText = fileText + "8" + " " + "8" + " " + PlayerColor + "\n";
+
+      for(let i = 0; i < 8; i++)
+      {
+        xPos = i.toString();
+
+        for(let j = 0; j < 8; j++)
+        {
+          yPos = j.toString();
+          pos = xPos + yPos;
+          
+          if(document.getElementById(pos).innerText != "")
+          {
+            fileText = fileText + xPos + " " + yPos; 
+            if(document.getElementById(pos).innerText == "♜") { fileText = fileText + " " + "r" + "\n"; }
+            if(document.getElementById(pos).innerText == "♞") { fileText = fileText + " " + "n" + "\n"; }
+            if(document.getElementById(pos).innerText == "♝") { fileText = fileText + " " + "b" + "\n"; }
+            if(document.getElementById(pos).innerText == "♛") { fileText = fileText + " " + "q" + "\n"; }
+            if(document.getElementById(pos).innerText == "♚") { fileText = fileText + " " + "k" + "\n"; }
+            if(document.getElementById(pos).innerText == "♟") { fileText = fileText + " " + "s" + "\n"; }
+            if(document.getElementById(pos).innerText == "♖") { fileText = fileText + " " + "R" + "\n"; }
+            if(document.getElementById(pos).innerText == "♘") { fileText = fileText + " " + "N" + "\n"; }
+            if(document.getElementById(pos).innerText == "♗") { fileText = fileText + " " + "B" + "\n"; }
+            if(document.getElementById(pos).innerText == "♔") { fileText = fileText + " " + "K" + "\n"; }
+            if(document.getElementById(pos).innerText == "♕") { fileText = fileText + " " + "Q" + "\n"; }
+            if(document.getElementById(pos).innerText == "♙") { fileText = fileText + " " + "S" + "\n"; }
+          }
+        }
+      }
+      
+      postMessage(fileText);
+    }
+  </script>
+
+<!-- Initialize the board -->
+  <div class="grid-container" id="1000">
+    <div class="Alphabet" style="left: 575px;">a</div>
+    <div class="Alphabet" style="left: 675px;">b</div>
+    <div class="Alphabet" style="left: 780px;">c</div>
+    <div class="Alphabet" style="left: 875px;">d</div>
+    <div class="Alphabet" style="left: 975px;">e</div>
+    <div class="Alphabet" style="left: 1085px;">f</div>
+    <div class="Alphabet" style="left: 1185px;">g</div>
+    <div class="Alphabet" style="left: 1285px;">h</div>
+    <div class="Numbers" style="bottom: 790px;" >8</div>
+    <div class = "Numbers" style="bottom: 690px;" >7</div>
+    <div class = "Numbers" style="bottom: 590px;" >6</div>
+    <div class = "Numbers" style="bottom: 480px;" >5</div>
+    <div class = "Numbers" style="bottom: 380px;" >4</div>
+    <div class = "Numbers" style="bottom: 280px;" >3</div>
+    <div class = "Numbers" style="bottom: 180px;" >2</div>
+    <div class = "Numbers" style="bottom: 80px;" >1</div>
+
+    <div class="BlackSquare" id = "00" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "01" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "02" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "03" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "04" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "05" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "06" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "07" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "10" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "11" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "12" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "13" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "14" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "15" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "16" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "17" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "20" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "21" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "22" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "23" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "24" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "25" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "26" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "27" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "30" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "31" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "32" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "33" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "34" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "35" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "36" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "37" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "40" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "41" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "42" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "43" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "44" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "45" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "46" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "47" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "50" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "51" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "52" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "53" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "54" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "55" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "56" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "57" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "60" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "61" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "62" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "63" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "64" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "65" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "66" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "67" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "70" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "71" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "72" data-color="" onclick="handleClick(this)"></div>  
+    <div class="BlackSquare" id = "73" data-color="" onclick="handleClick(this)"></div>
+    <div class="WhiteSquare" id = "74" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "75" data-color="" onclick="handleClick(this)"></div>  
+    <div class="WhiteSquare" id = "76" data-color="" onclick="handleClick(this)"></div>
+    <div class="BlackSquare" id = "77" data-color="" onclick="handleClick(this)"></div>
+  </div>
+</body>
+</html>
